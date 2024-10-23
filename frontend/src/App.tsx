@@ -7,6 +7,8 @@ import Projects from "./components/Projects";
 import CreateProject from "./components/CreateProject";
 import useProjects from "./hooks/useProjects";
 import config from './config'; // Importer config
+import { API_BASE_URL, STUDENT_NAME, DEGREE, POINTS, EMAIL } from './config';
+
 
 
 
@@ -19,10 +21,10 @@ type ProjectType = {
 }
 
 const App: React.FC = () => {
-  const student = 'Halgeir Geirson';
-  const degree = 'Bachelor IT';
-  const points = 180;
-  const email = 'student@hiof.no';
+  const student = {STUDENT_NAME};
+  const degree = {DEGREE};
+  const points = {POINTS};
+  const email = {EMAIL};
 
  // Bruk custom hook for å hente prosjekter
  const { projects, error } = useProjects();
