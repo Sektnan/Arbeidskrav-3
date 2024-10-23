@@ -1,28 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchProjects } from '../services/api';
+import { ProjectSchema, ProjectType } from '../schemas/projectSchema';
 
-const useProjects = () => {
-  const [projects, setProjects] = useState([]);
+export const useProjects = () => {
+  const [projects, setProjects] = useState<ProjectType[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const getProjects = async () => {
-      setLoading(true);
+    const loadProjects = async () => {
       try {
         const data = await fetchProjects();
-        setProjects(data);
-      } catch (err) {
-        setError('Unable to fetch projects');
-      } finally {
-        setLoading(false);
+
+        // Valider prosjektdata med Zod-skjema
+        const parsedProjects = ProjectSchema.array().parse(data); // Parse data som en array
+        setProjects(parsedProjects);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          // Håndter Zod-feil spesifikt hvis du ønsker å logge eller vise feil
+          setError('Data validation error: ' + error.errors.map(err => err.message).join(', '));
+        } else {
+          setError('Det har oppstått en feil ved henting av prosjekter');
+        }
+        console.error(error);
       }
     };
 
-    getProjects();
+    loadProjects();
   }, []);
 
-  return { projects, error, loading };
+  return { projects, error };
 };
-
-export default useProjects;
