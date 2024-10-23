@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { fetchProjects } from '../services/api';
 import { ProjectSchema, ProjectType } from '../schemas/projectSchema';
+import { z } from 'zod';
+
 
 export const useProjects = () => {
   const [projects, setProjects] = useState<ProjectType[]>([]);
