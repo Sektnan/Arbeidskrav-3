@@ -11,6 +11,15 @@ const App: React.FC = () => {
   const points = 180;
   const email = 'student@hiof.no';
 
+  type ProjectType = {
+    id: number;
+    title: string;
+    description: string;
+    details: string;
+    category: string;
+    publishedAt: string; // La til publishedAt her
+  }
+
   // Bruk hooket til å hente prosjekter
   const { projects, error } = useProjects();
 

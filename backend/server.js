@@ -16,6 +16,7 @@ const projects = [
         title: 'Prosjekt A',
         description: 'Beskrivelse av prosjekt A',
         createdAt: new Date('2024-01-01'),
+        publishedAt: new Date('2024-01-15'),
         category: 'Web-development'
     },
     { 
@@ -23,6 +24,7 @@ const projects = [
         title: 'Prosjekt B', 
         description: 'Beskrivelse av prosjekt B', 
         createdAt: new Date('2024-02-01'), 
+        publishedAt: new Date('2024-02-15'),
         category: 'Mobil-app' 
     },
     { 
@@ -30,6 +32,7 @@ const projects = [
         title: 'Prosjekt C', 
         description: 'Beskrivelse av prosjekt C', 
         createdAt: new Date('2024-03-01'), 
+        publishedAt: new Date('2024-03-15'),
         category: 'Data-Tek' 
     }
 ];

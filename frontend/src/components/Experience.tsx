@@ -1,4 +1,6 @@
 import React from 'react';
+import { format } from 'date-fns';
+import dayjs from 'dayjs';
 
 // Definerer typen for erfaring
 type ExperienceProps = {
