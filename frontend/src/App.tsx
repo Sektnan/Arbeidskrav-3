@@ -5,6 +5,9 @@ import Experiences from "./components/Experiences";
 import Header from "./components/Header";
 import Projects from "./components/Projects";
 import CreateProject from "./components/CreateProject";
+import useProjects from "./hooks/useProjects";
+import config from './config'; // Importer config
+
 
 
 type ProjectType = {
@@ -21,50 +24,30 @@ const App: React.FC = () => {
   const points = 180;
   const email = 'student@hiof.no';
 
-  // State for prosjekter
-  const [projects, setProjects] = useState<ProjectType[]>([]);
+ // Bruk custom hook for å hente prosjekter
+ const { projects, error } = useProjects();
 
-  const [error, setError] = useState<string | null>(null);
+ // Håndtering av opprettelse av prosjekter
+ const handleCreateProject = (newProject: Omit<ProjectType, 'id'> ) => {
+   const projectWithId = { ...newProject, id: Date.now() };
+   // Oppdater state med nytt prosjekt
+   // For senere bruk: Kan også sende POST request til server for å lagre på backend
+ };
 
+ // Håndtering av fjerning av prosjekter
+ const handleRemoveProject = (index: number) => {
+   // Oppdater state med å fjerne et prosjekt
+ };
 
-useEffect(() => {
-  const fetchProjects = async () => {
-    try{
-      const response = await fetch('http://localhost:3999/api/projects');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      setProjects(data);
-    } catch (error) {
-      setError('Det har oppstått en feil ved henting av prosjekter')
-      console.error(error);
-    }
-  };
-  fetchProjects();
-}, []);
-
-
-  // Håndtering av opprettelse av prosjekter
-  const handleCreateProject = (newProject: Omit<ProjectType, 'id'> ) => {
-    const projectWithId = { ...newProject, id: Date.now() };
-    setProjects((prevProjects) => [...prevProjects, projectWithId]);
-};
-
-  // Håndtering av fjerning av prosjekter
-  const handleRemoveProject = (index: number) => {
-    setProjects((prevProjects) => prevProjects.filter((_, i) => i !== index));
-  };
-
-  return (
-    <div>
-      <Header student={student} degree={degree} points={points} />
+ return (
+   <div>
+      <Header student={config.STUDENT} degree={config.DEGREE} points={config.POINTS} />
       <Experiences />
-      <Contact email={email} />
-      {error && <p>{error}</p>}
-      <Projects projects={projects} onCreate={handleCreateProject} onRemove={handleRemoveProject} />
-    </div>
-  );
+     <Contact email={email} />
+     {error && <p>{error}</p>}
+     <Projects projects={projects} onCreate={handleCreateProject} onRemove={handleRemoveProject} />
+   </div>
+ );
 };
 
 export default App;
