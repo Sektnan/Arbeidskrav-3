@@ -4,12 +4,16 @@ import Experiences from "./components/Experiences";
 import Header from "./components/Header";
 import Projects from "./components/Projects";
 import { useProjects } from "./hooks/useProjects"; // Importer hooket
+import PortfolioPage from './pages/PortfolioPage'; // Importer den nye siden
+
 
 const App: React.FC = () => {
-  const student = 'Halgeir Geirson';
-  const degree = 'Bachelor IT';
-  const points = 180;
-  const email = 'student@hiof.no';
+  return (
+    <div>
+      <PortfolioPage /> {/* Bruker PortfolioPage som hovedinnhold */}
+    </div>
+  );
+};
 
   type ProjectType = {
     id: number;
