@@ -1,8 +1,16 @@
 import React, { useState } from "react";
-import { ProjectType } from '../types'; // Importerer ProjectType for typing
 
 type CreateProjectProps = {
-    onCreate: (newProject: Omit<ProjectType, 'id'>) => void; // Bruker Omit for å ekskludere id
+    onCreate: (newProject: {
+        title: string;
+        description: string;
+        details: string;
+        category: string;
+        publishedAt: string; 
+        public: boolean;     
+        status: 'draft' | 'published'; 
+        tags: string[];      
+    }) => void;
 };
 
 const CreateProject: React.FC<CreateProjectProps> = ({ onCreate }) => {
@@ -12,36 +20,46 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onCreate }) => {
     const [details, setDetails] = useState('');
     const [category, setCategory] = useState('');
     const [publishedAt, setPublishedAt] = useState('');
-    const [publicProject, setPublicProject] = useState(false);
+    const [isPublic, setIsPublic] = useState(false);
     const [status, setStatus] = useState<'draft' | 'published'>('draft');
-    const [tags, setTags] = useState('');
+    const [tags, setTags] = useState<string[]>([]);
 
     // Håndterer skjema-innsending
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         // Opprett nytt prosjekt objekt
-        const newProject = { 
-            title, 
-            description, 
-            details, 
-            category, 
-            publishedAt, 
-            public: publicProject, 
-            status, 
-            tags: tags.split(',').map(tag => tag.trim()), // Konverterer tags til array
-        };
-        onCreate(newProject); 
+        const newProject = { title, description, details, category, publishedAt, public: isPublic, status, tags };
+        
+        // Send data til backend
+        try {
+            const response = await fetch('http://localhost:3999/api/projects', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newProject),
+            });
 
-        // Nullstill feltene etter innsending
-        setTitle('');
-        setDescription('');
-        setDetails('');
-        setCategory('');
-        setPublishedAt('');
-        setPublicProject(false);
-        setStatus('draft');
-        setTags('');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            // Kall onCreate for å oppdatere state i Projects-komponenten
+            onCreate(newProject);
+
+            // Nullstill feltene etter innsending
+            setTitle('');
+            setDescription('');
+            setDetails('');
+            setCategory('');
+            setPublishedAt('');
+            setIsPublic(false);
+            setStatus('draft');
+            setTags([]);
+        } catch (error) {
+            console.error('Feil ved opprettelse av prosjekt:', error);
+        }
     };
 
     return (
@@ -89,7 +107,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onCreate }) => {
             </div>
 
             <div>
-                <label htmlFor="publishedAt">Publisert den</label>
+                <label htmlFor="publishedAt">Publiseringsdato</label>
                 <input
                     type="date"
                     id="publishedAt"
@@ -100,31 +118,34 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onCreate }) => {
             </div>
 
             <div>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={publicProject}
-                        onChange={(e) => setPublicProject(e.target.checked)}
-                    />
-                    Offentlig
-                </label>
+                <label htmlFor="public">Offentlig</label>
+                <input
+                    type="checkbox"
+                    id="public"
+                    checked={isPublic}
+                    onChange={(e) => setIsPublic(e.target.checked)}
+                />
             </div>
 
             <div>
                 <label htmlFor="status">Status</label>
-                <select id="status" value={status} onChange={(e) => setStatus(e.target.value as 'draft' | 'published')}>
-                    <option value="draft">Utkast</option>
+                <select
+                    id="status"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as 'draft' | 'published')}
+                >
+                    <option value="draft">Kladd</option>
                     <option value="published">Publisert</option>
                 </select>
             </div>
 
             <div>
-                <label htmlFor="tags">Tags (komma-separert)</label>
+                <label htmlFor="tags">Tags (separer med komma)</label>
                 <input
                     type="text"
                     id="tags"
-                    value={tags}
-                    onChange={(e) => setTags(e.target.value)}
+                    value={tags.join(', ')} // Konverterer array til tekst
+                    onChange={(e) => setTags(e.target.value.split(',').map(tag => tag.trim()))} // Deler opp i array
                 />
             </div>
 
