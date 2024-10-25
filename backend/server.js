@@ -4,14 +4,14 @@ const cors = require('cors');
 const app = express();
 app.use(express.json()); // For å håndtere JSON-kropp i forespørslene
 
-//Konfig CORS-middelvaren for Express-appen 
+// Konfigurer CORS-middelvaren for Express-appen 
 app.use(cors({
     origin: 'http://localhost:5173', // Definerer hvilken URL som har lov til å gjøre forespørsel til backend
     methods: 'GET,POST,PUT,DELETE',  // Tillat hvilke HTTP metoder jeg trenger
     credentials: true                // Om jeg skal tillate credentials (feks cookies eller autentisering)
 }));
 
-const projects = [
+let projects = [ // Endret 'const' til 'let' for å kunne oppdatere projects
     {
         id: 1,
         title: 'Prosjekt A',
@@ -47,19 +47,37 @@ const projects = [
     }
 ];
 
+// Hent alle prosjekter
 app.get('/api/projects', (req, res) => {
     res.json(projects);
 });
 
-// Nytt API-endepunkt for å opprette et nytt prosjekt
+// Opprett et nytt prosjekt
 app.post('/api/projects', (req, res) => {
     const newProject = {
         id: projects.length + 1, // Generer nytt ID basert på eksisterende prosjekter
         ...req.body // Kopierer data fra forespørselen
     };
 
-    projects.push(newProject); // Legg til det nye prosjektet i arrayen
-    res.status(201).json(newProject); // Send tilbake det nyopprettede prosjektet
+    projects.push(newProject); // Legger til det nye prosjektet i arrayen
+    res.status(201).json(newProject); // Sender tilbake det nyopprettede prosjektet
+});
+
+// Slett et prosjekt
+app.delete('/api/projects/:id', (req, res) => {
+    const { id } = req.params;
+    const projectId = parseInt(id, 10);
+    
+    // Filtrer ut prosjektet med den gitte ID
+    const initialLength = projects.length;
+    projects = projects.filter(project => project.id !== projectId);
+
+    // Sjekk om prosjektet ble funnet og slettet
+    if (projects.length < initialLength) {
+        res.status(204).send(); // Ingen innhold for vellykket sletting
+    } else {
+        res.status(404).send('Prosjekt ikke funnet'); // Hvis prosjektet ikke ble funnet
+    }
 });
 
 // Start serveren

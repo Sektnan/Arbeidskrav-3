@@ -2,23 +2,24 @@ import React from "react";
 import Project from './Project'; 
 import CreateProject from './CreateProject';
 
-// Props for Projects-komponenten
+// Typen for prosjektet
 type ProjectType = {
-    id: number; // Husk å inkludere id
+    id: number; // For å identifisere prosjektet
     title: string;
     description: string;
     details: string;
     category: string;
-    publishedAt: string; // Nytt felt
-    public: boolean;     // Nytt felt
-    status: 'draft' | 'published'; // Nytt felt
-    tags: string[];      // Nytt felt
+    publishedAt: string; 
+    public: boolean;     
+    status: 'draft' | 'published'; 
+    tags: string[];      
 };
 
+// Props for Projects-komponenten
 type ProjectProps = {
     projects: ProjectType[];
     onCreate: (newProject: ProjectType) => void;
-    onRemove: (index: number) => void;
+    onRemove: (id: number) => void; // Endret til å ta id i stedet for index
 }
 
 // Projects-komponenten som viser flere prosjekter
@@ -31,7 +32,25 @@ const Projects: React.FC<ProjectProps> = ({ projects, onCreate, onRemove }) => {
         }
         acc[project.category] += 1;  // Øker totalen for kategorien 
         return acc;
-    }, {} as Record<string, number>); // initier som et tomt objekt
+    }, {} as Record<string, number>); // Initierer som et tomt objekt
+
+    // Håndterer sletting av prosjekt
+    const handleRemove = async (id: number) => {
+        try {
+            const response = await fetch(`http://localhost:3999/api/projects/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            // Kall onRemove for å oppdatere state i parent-komponenten
+            onRemove(id);
+        } catch (error) {
+            console.error('Feil ved sletting av prosjekt:', error);
+        }
+    };
 
     return (
         <div>
@@ -50,18 +69,18 @@ const Projects: React.FC<ProjectProps> = ({ projects, onCreate, onRemove }) => {
             )}
 
             {/* Vis prosjektene */}
-            {projects.map((project, index) => (
-                <div key={project.id}> {/* Bruk prosjektets ID her for unik nøkkel */}
+            {projects.map((project) => (
+                <div key={project.id}> {/* Bruk id som key */}
                     <Project
                         title={project.title} 
                         description={project.description}
                         details={project.details}
-                        publishedAt={project.publishedAt} // Send med de nye feltene
-                        public={project.public}
-                        status={project.status}
-                        tags={project.tags}
+                        publishedAt={project.publishedAt}
+                        public={project.public} // Passer på at public-feltet sendes
+                        status={project.status}  // Passer på at status-feltet sendes
+                        tags={project.tags}      // Passer på at tags-feltet sendes
                     />
-                    <button onClick={() => onRemove(index)}>Fjern Prosjekt</button>
+                    <button onClick={() => handleRemove(project.id)}>Fjern Prosjekt</button>
                 </div>
             ))}
         </div>
