@@ -1,24 +1,20 @@
-import React from 'react';
-import Header from '../components/Header';
-import Experiences from '../components/Experiences';
-import Contact from '../components/Contact';
-import Projects from '../components/Projects';
-import CreateProject from '../components/CreateProject';
-import { useProjects } from '../hooks/useProjects'; // Custom hook for prosjekter
-import Layout from '../components/Layout';
+// PortfolioPage.tsx
+import React from "react";
+import { useProjects } from "../hooks/useProjects";
+import Projects from "../components/Projects";
 
 const PortfolioPage: React.FC = () => {
-  const { projects, handleCreateProject, handleRemoveProject, error } = useProjects();
+  const { projects, error } = useProjects();
 
   return (
-    <Layout>
-      <Header student="Halgeir Geirson" degree="Bachelor IT" points={180} />
-      <Experiences />
-      <Contact email="student@hiof.no" />
+    <div>
       {error && <p>{error}</p>}
-      <Projects projects={projects} onCreate={handleCreateProject} onRemove={handleRemoveProject} />
-      <CreateProject onCreate={handleCreateProject} />
-    </Layout>
+      <Projects projects={projects} onCreate={function (newProject: { title: string; description: string; details: string; category: string; }): void {
+        throw new Error("Function not implemented.");
+      } } onRemove={function (index: number): void {
+        throw new Error("Function not implemented.");
+      } } />
+    </div>
   );
 };
 

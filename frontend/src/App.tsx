@@ -3,28 +3,17 @@ import Contact from "./components/Contact";
 import Experiences from "./components/Experiences";
 import Header from "./components/Header";
 import Projects from "./components/Projects";
-import { useProjects } from "./hooks/useProjects"; // Importer hooket
-import PortfolioPage from './pages/PortfolioPage'; // Importer den nye siden
-
+import { useProjects } from "./hooks/useProjects";
+import PortfolioPage from './pages/PortfolioPage';
 
 const App: React.FC = () => {
-  return (
-    <div>
-      <PortfolioPage /> {/* Bruker PortfolioPage som hovedinnhold */}
-    </div>
-  );
-};
 
-  type ProjectType = {
-    id: number;
-    title: string;
-    description: string;
-    details: string;
-    category: string;
-    publishedAt: string; // La til publishedAt her
-  }
+  const student = 'Halgeir Geirson';
+  const degree = 'Bachelor IT';
+  const points = 180;
+  const email = 'student@hiof.no';
 
-  // Bruk hooket til å hente prosjekter
+  // Bruker hooket til å hente prosjekter
   const { projects, error } = useProjects();
 
   return (
@@ -33,11 +22,8 @@ const App: React.FC = () => {
       <Experiences />
       <Contact email={email} />
       {error && <p>{error}</p>}
-      <Projects projects={projects} onCreate={function (): void {
-        throw new Error("Function not implemented.");
-      } } onRemove={function (): void {
-        throw new Error("Function not implemented.");
-      } } />
+      <Projects projects={projects} />
+      <PortfolioPage />
     </div>
   );
 };
